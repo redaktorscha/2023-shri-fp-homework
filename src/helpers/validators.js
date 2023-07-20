@@ -11,17 +11,11 @@ import {
   __,
   pipe,
   keys,
-  curry,
   all,
   values,
   complement,
-  and,
-  not,
   anyPass,
   apply,
-  map,
-  reduce,
-  props,
   juxt,
 } from 'ramda';
 
