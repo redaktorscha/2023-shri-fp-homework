@@ -22,6 +22,7 @@ import {
   map,
   reduce,
   props,
+  juxt,
 } from 'ramda';
 
 /**
@@ -38,7 +39,6 @@ import {
  *
  * Если какие либо функции написаны руками (без использования библиотек) это не является ошибкой
  */
-const reduceToColorCount = (acc, cur) => ({...acc, [cur]: (acc[cur] || 0) + 1});
 
 //helpers
 const getStar = prop('star');
@@ -102,7 +102,7 @@ export const validateFieldN1 = allPass([isRedStar, isGreenSquare, isWhiteTriangl
 export const validateFieldN2 = minTwoGreenFigures;
 
 // 3. Количество красных фигур равно кол-ву синих.
-export const validateFieldN3 = pipe(values, reduce(reduceToColorCount, {}), props(['red', 'blue']), checkArrElemsEquality);
+export const validateFieldN3 = pipe(juxt([getRedQuantity, getBlueQuantity]), checkArrElemsEquality);
 
 // 4. Синий круг, красная звезда, оранжевый квадрат треугольник любого цвета
 export const validateFieldN4 = allPass([isBlueCircle, isRedStar, isOrangeSquare]);
