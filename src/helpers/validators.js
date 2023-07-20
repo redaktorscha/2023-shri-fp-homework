@@ -38,7 +38,6 @@ import {
  *
  * Если какие либо функции написаны руками (без использования библиотек) это не является ошибкой
  */
-const getInputData = (data) => data;
 const reduceToColorCount = (acc, cur) => ({...acc, [cur]: (acc[cur] || 0) + 1});
 
 //helpers
@@ -92,36 +91,36 @@ const isNotRedStar = complement(isRedStar);
 const isNotWhiteStar = complement(isWhiteStar);
 
 
-const checkArrEquality = apply(equals);
-const triangleColorEqualsSquareColor = compose(checkArrEquality, values, pick(['triangle', 'square']));
+const checkArrElemsEquality = apply(equals);
+const triangleColorEqualsSquareColor = compose(checkArrElemsEquality, values, pick(['triangle', 'square']));
 
 
 // 1. Красная звезда, зеленый квадрат, все остальные белые.
-export const validateFieldN1 = pipe(getInputData, allPass([isRedStar, isGreenSquare, isWhiteTriangle, isWhiteCircle]));
+export const validateFieldN1 = allPass([isRedStar, isGreenSquare, isWhiteTriangle, isWhiteCircle]);
 
 // 2. Как минимум две фигуры зеленые.
-export const validateFieldN2 = pipe(getInputData, minTwoGreenFigures);
+export const validateFieldN2 = minTwoGreenFigures;
 
 // 3. Количество красных фигур равно кол-ву синих.
-export const validateFieldN3 = pipe(getInputData, values, reduce(reduceToColorCount, {}), props(['red', 'blue']), checkArrEquality);
+export const validateFieldN3 = pipe(values, reduce(reduceToColorCount, {}), props(['red', 'blue']), checkArrElemsEquality);
 
 // 4. Синий круг, красная звезда, оранжевый квадрат треугольник любого цвета
-export const validateFieldN4 = pipe(getInputData, allPass([isBlueCircle, isRedStar, isOrangeSquare]));
+export const validateFieldN4 = allPass([isBlueCircle, isRedStar, isOrangeSquare]);
 
 // 5. Три фигуры одного любого цвета кроме белого (четыре фигуры одного цвета – это тоже true).
-export const validateFieldN5 = pipe(getInputData, anyPass([minThreeGreenFigures, minThreeRedFigures, minThreeOrangeFigures, minThreeBlueFigures]));
+export const validateFieldN5 = anyPass([minThreeGreenFigures, minThreeRedFigures, minThreeOrangeFigures, minThreeBlueFigures]);
 
 // 6. Ровно две зеленые фигуры (одна из зелёных – это треугольник), плюс одна красная. Четвёртая оставшаяся любого доступного цвета, но не нарушающая первые два условия
-export const validateFieldN6 = pipe(getInputData, allPass([twoGreenFigures, isGreenTriangle, oneRedFigure]));
+export const validateFieldN6 = allPass([twoGreenFigures, isGreenTriangle, oneRedFigure]);
 
 // 7. Все фигуры оранжевые.
-export const validateFieldN7 = pipe(getInputData, values, areAllOrange);
+export const validateFieldN7 = pipe(values, areAllOrange);
 
 // 8. Не красная и не белая звезда, остальные – любого цвета.
-export const validateFieldN8 = pipe(getInputData, allPass([isNotRedStar, isNotWhiteStar]));
+export const validateFieldN8 = allPass([isNotRedStar, isNotWhiteStar]);
 
 // 9. Все фигуры зеленые.
-export const validateFieldN9 = pipe(getInputData, values, areAllGreen);
+export const validateFieldN9 = pipe(values, areAllGreen);
 
 // 10. Треугольник и квадрат одного цвета (не белого), остальные – любого цвета
-export const validateFieldN10 = pipe(getInputData, allPass([isNotWhiteTriangle, isNotWhiteSquare, triangleColorEqualsSquareColor]));
+export const validateFieldN10 =  allPass([isNotWhiteTriangle, isNotWhiteSquare, triangleColorEqualsSquareColor]);
