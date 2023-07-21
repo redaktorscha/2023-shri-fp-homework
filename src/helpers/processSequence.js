@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 /**
  * @file Домашка по FP ч. 2
  *
@@ -14,38 +15,106 @@
  * Иногда промисы от API будут приходить в состояние rejected, (прямо как и API в реальной жизни)
  * Ответ будет приходить в поле {result}
  */
- import Api from '../tools/api';
+import Api from '../tools/api';
+import {
+  allPass,
+  lt,
+  gt,
+  prop,
+  length,
+  compose,
+  __,
+  pipe,
+  test,
+  mathMod,
+  otherwise,
+  andThen,
+  flip,
+  tap,
+  ifElse,
+  partial,
+  converge,
+} from 'ramda';
 
- const api = new Api();
+//constants
+const BASE_TEN = 10;
+const BASE_TWO = 2;
+const API_NUMBERS = 'https://api.tech/numbers/base';
+const API_ANIMALS = 'https://animals.tech';
 
- /**
-  * Я – пример, удали меня
-  */
- const wait = time => new Promise(resolve => {
-     setTimeout(resolve, time);
- })
 
- const processSequence = ({value, writeLog, handleSuccess, handleError}) => {
-     /**
-      * Я – пример, удали меня
-      */
-     writeLog(value);
+//helpers
+const routes = {
+  numbers: () => API_NUMBERS,
+  animals: (id) => [API_ANIMALS, id].join('/'),
+};
 
-     api.get('https://api.tech/numbers/base', {from: 2, to: 10, number: '01011010101'}).then(({result}) => {
-         writeLog(result);
-     });
+const configs = {
+  numbers: (val) => ({
+    from: BASE_TEN,
+    to: BASE_TWO,
+    number: val,
+  }),
+  animals: () => ({}),
+}
 
-     wait(2500).then(() => {
-         writeLog('SecondLog')
+const regex = /([0-9]*[.])?[0-9]+/;
 
-         return wait(1500);
-     }).then(() => {
-         writeLog('ThirdLog');
+const charCountLessThenTen = compose(lt(__, 10), length);
+const charCountMoreThenTwo = compose(gt(__, 2), length);
+const isPositive = compose(gt(__, 0), Number);
+const isNumber = test(regex);
+const toStringifiedRoundedNumber = compose(String, Math.round, Number);
+const getLength = length;
+const getPowTwo = compose(flip(Math.pow)(2), Number);
+const getRemainderDividedByThree = mathMod(__, 3);
 
-         return wait(400);
-     }).then(() => {
-         handleSuccess('Done');
-     });
- }
+const getResult = prop('result');
+
+const validateInput = allPass([
+  charCountLessThenTen,
+  charCountMoreThenTwo,
+  isPositive,
+  isNumber,
+]);
+
+const api = new Api();
+
+const getConvertedToBaseTwo = converge(api.get, [routes.numbers, configs.numbers]);
+
+const getAnimalType = converge(api.get, [routes.animals, configs.animals]);
+
+
+const processSequence = ({ value, writeLog, handleSuccess, handleError }) => {
+  const log = tap(writeLog);
+  const onError = partial(handleError, ['ValidationError']);
+
+  const handleInput = pipe(
+    toStringifiedRoundedNumber,
+    log,
+    getConvertedToBaseTwo,
+    andThen(getResult),
+    andThen(log),
+    andThen(getLength),
+    andThen(log),
+    andThen(getPowTwo),
+    andThen(log),
+    andThen(getRemainderDividedByThree),
+    andThen(log),
+    andThen(getAnimalType),
+    andThen(getResult),
+    andThen(handleSuccess),
+    otherwise(handleError),
+  );
+
+  const handleValidation = ifElse(validateInput, handleInput, onError);
+
+  const initSequence = pipe(
+    log,
+    handleValidation,
+  );
+
+  initSequence(value);
+};
 
 export default processSequence;
