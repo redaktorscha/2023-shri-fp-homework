@@ -15,3 +15,6 @@
 - [Документация Lodash](https://lodash.com/docs/4.17.15)
 - [Документация Ramda](https://ramdajs.com/docs/)
 - [Код с практикума](https://github.com/MoonW1nd/fp-live-coding)
+
+### Мои контакты:
+tg: [@redaktorscha](https://t.me/redaktorscha)https://t.me/redaktorscha
